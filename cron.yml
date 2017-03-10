@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: Delete all renew scripts
+    file: path=/opt/renew-certificates state=absent
+
+  - name: Delete renewcert
+    file: path=/etc/cron.d/renewcert state=absent
+
+  - name: Insert config to cron.monthly
+    template:
+      src: "updatecert.sh"
+      dest: "/etc/cron.monthly/updatecert.sh"
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Restart crond
+    service: name=crond state=restarted
